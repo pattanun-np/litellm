@@ -280,6 +280,7 @@ class _PROXY_LiteLLMManagedFiles(CustomLogger, BaseFileEndpoints):
             "audio_transcription",
             "pass_through_endpoint",
             "rerank",
+            "mcp_call",
             "acreate_batch",
             "aretrieve_batch",
             "acreate_file",

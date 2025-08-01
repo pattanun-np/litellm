@@ -51,6 +51,7 @@ from litellm import (
     ModelResponse,
     ModelResponseStream,
     Router,
+    _custom_logger_compatible_callbacks_literal,
 )
 from litellm.types.mcp import (
     MCPPreCallRequestObject,
@@ -508,8 +509,10 @@ class ProxyLogging:
             try:
                 _callback: Optional[CustomLogger] = None
                 if isinstance(callback, str):
+                    from litellm import _custom_logger_compatible_callbacks_literal
+                    from typing import cast
                     _callback = litellm.litellm_core_utils.litellm_logging.get_custom_logger_compatible_class(
-                        callback
+                        cast(_custom_logger_compatible_callbacks_literal, callback)
                     )
                 else:
                     _callback = callback  # type: ignore
@@ -530,8 +533,12 @@ class ProxyLogging:
                     # Convert MCP tool call to LLM message format for existing guardrail logic
                     synthetic_llm_data = self._convert_mcp_to_llm_format(request_obj, kwargs)
                     # Reuse existing LLM guardrail logic
+                    user_api_key_dict = kwargs.get("user_api_key_auth")
+                    if user_api_key_dict is None:
+                        # Skip if no user_api_key_dict is available
+                        continue
                     result = await _callback.async_pre_call_hook(
-                        user_api_key_dict=kwargs.get("user_api_key_auth"),
+                        user_api_key_dict=user_api_key_dict,
                         cache=self.call_details["user_api_key_cache"],
                         data=synthetic_llm_data,
                         call_type="mcp_call"
@@ -824,7 +831,7 @@ class ProxyLogging:
                 _callback: Optional[CustomLogger] = None
                 if isinstance(callback, str):
                     _callback = litellm.litellm_core_utils.litellm_logging.get_custom_logger_compatible_class(
-                        callback
+                        cast(_custom_logger_compatible_callbacks_literal, callback)
                     )
                 else:
                     _callback = callback  # type: ignore
@@ -973,7 +980,7 @@ class ProxyLogging:
                 _callback = None
                 if isinstance(callback, str):
                     _callback = litellm.litellm_core_utils.litellm_logging.get_custom_logger_compatible_class(
-                        callback
+                        cast(_custom_logger_compatible_callbacks_literal, callback)
                     )
                 else:
                     _callback = callback  # type: ignore
