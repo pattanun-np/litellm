@@ -2318,6 +2318,7 @@ class LlmProviders(str, Enum):
     PG_VECTOR = "pg_vector"
     HYPERBOLIC = "hyperbolic"
     RECRAFT = "recraft"
+    LODASH = "lodash"
     AUTO_ROUTER = "auto_router"
     DOTPROMPT = "dotprompt"
 

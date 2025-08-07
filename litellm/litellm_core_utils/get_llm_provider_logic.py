@@ -349,6 +349,9 @@ def get_llm_provider(  # noqa: PLR0915
         # openai embeddings
         elif model in litellm.open_ai_embedding_models:
             custom_llm_provider = "openai"
+        # lodash embeddings
+        elif model in litellm.lodash_embedding_models:
+            custom_llm_provider = "lodash"
         elif model in litellm.empower_models:
             custom_llm_provider = "empower"
         elif model == "*":

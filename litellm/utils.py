@@ -6940,6 +6940,10 @@ class ProviderConfigManager:
             from litellm.llms.cohere.embed.transformation import CohereEmbeddingConfig
 
             return CohereEmbeddingConfig()
+        elif litellm.LlmProviders.LODASH == provider:
+            from litellm.llms.lodash.embedding.transformation import LodashEmbeddingConfig
+
+            return LodashEmbeddingConfig()
         return None
 
     @staticmethod

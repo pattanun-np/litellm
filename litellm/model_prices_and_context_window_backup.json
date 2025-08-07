@@ -17445,5 +17445,511 @@
         "supports_vision": false,
         "supports_system_messages": true,
         "supports_tool_choice": false
+    },
+    "lodash/clip-ViT-L-14": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 768
+    },
+    "lodash/clip-ViT-B-16": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 512
+    },
+    "lodash/clip-ViT-B-32": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 512
+    },
+    "lodash/all-mpnet-base-v2": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 768
+    },
+    "lodash/all-distilroberta-v1": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 768
+    },
+    "lodash/all-MiniLM-L12-v2": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 384
+    },
+    "lodash/multi-qa-distilbert-cos-v1": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 768
+    },
+    "lodash/all-MiniLM-L6-v2": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 384
+    },
+    "lodash/multi-qa-MiniLM-L6-cos-v1": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 384
+    },
+    "lodash/paraphrase-albert-small-v2": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 768
+    },
+    "lodash/paraphrase-multilingual-MiniLM-L12-v2": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 384
+    },
+    "lodash/paraphrase-MiniLM-L3-v2": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 384
+    },
+    "lodash/distiluse-base-multilingual-cased-v1": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 512
+    },
+    "lodash/distiluse-base-multilingual-cased-v2": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 512
+    },
+    "lodash/clip-ViT-B-32-multilingual-v1": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 512
+    },
+    "lodash/Qdrant/resnet50-onnx": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 2048
+    },
+    "lodash/Qdrant/clip-ViT-B-32-vision": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 512
+    },
+    "lodash/Qdrant/Unicom-ViT-B-32": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 512
+    },
+    "lodash/Qdrant/Unicom-ViT-B-16": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 768
+    },
+    "lodash/BAAI/bge-m3": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 1024
+    },
+    "lodash/BAAI/bge-small-en-v1.5": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 384
+    },
+    "lodash/BAAI/bge-small-zh-v1.5": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 512
+    },
+    "lodash/BAAI/bge-base-en-v1.5": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 768
+    },
+    "lodash/BAAI/bge-large-en-v1.5": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 1024
+    },
+    "lodash/mixedbread-ai/mxbai-embed-large-v1": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 1024
+    },
+    "lodash/Qdrant/clip-ViT-B-32-text": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 512
+    },
+    "lodash/snowflake/snowflake-arctic-embed-xs": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 384
+    },
+    "lodash/snowflake/snowflake-arctic-embed-s": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 384
+    },
+    "lodash/snowflake/snowflake-arctic-embed-m": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 768
+    },
+    "lodash/snowflake/snowflake-arctic-embed-l": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 1024
+    },
+    "lodash/microsoft/unixcoder-base": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "output_vector_size": 768
+    },
+    "lodash/resnet18": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 512
+    },
+    "lodash/resnet34": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 512
+    },
+    "lodash/resnet50": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 2048
+    },
+    "lodash/resnet101": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 2048
+    },
+    "lodash/resnet152": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 2048
+    },
+    "lodash/alexnet": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 4096
+    },
+    "lodash/vgg11": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 4096
+    },
+    "lodash/vgg13": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 4096
+    },
+    "lodash/vgg16": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 4096
+    },
+    "lodash/vgg19": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 4096
+    },
+    "lodash/densenet121": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 1024
+    },
+    "lodash/densenet161": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 2208
+    },
+    "lodash/densenet169": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 1664
+    },
+    "lodash/densenet201": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 1920
+    },
+    "lodash/efficientnet_b0": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 1280
+    },
+    "lodash/efficientnet_b1": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 1280
+    },
+    "lodash/efficientnet_b2": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 1408
+    },
+    "lodash/efficientnet_b3": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 1536
+    },
+    "lodash/efficientnet_b4": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 1792
+    },
+    "lodash/efficientnet_b5": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 2048
+    },
+    "lodash/efficientnet_b6": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 2304
+    },
+    "lodash/efficientnet_b7": {
+        "max_tokens": 8191,
+        "max_input_tokens": 8191,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "lodash",
+        "mode": "embedding",
+        "supports_embedding_image_input": true,
+        "output_vector_size": 2560
     }
 }
