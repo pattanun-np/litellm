@@ -3290,6 +3290,64 @@ def handle_exception_on_proxy(e: Exception) -> ProxyException:
 
     verbose_proxy_logger.exception(f"Exception: {e}")
 
+    # Map common LiteLLM exceptions to appropriate ProxyException codes
+    try:
+        import litellm as _litellm_mod
+    except Exception:
+        _litellm_mod = None
+
+    def _strip_prefix(msg: str) -> str:
+        if not isinstance(msg, str):
+            return str(msg)
+        prefixes = [
+            "litellm.BadRequestError: ",
+            "litellm.NotFoundError: ",
+            "litellm.AuthenticationError: ",
+            "litellm.UnprocessableEntityError: ",
+            "litellm.Timeout: ",
+        ]
+        for p in prefixes:
+            if msg.startswith(p):
+                return msg[len(p) :]
+        return msg
+
+    if _litellm_mod is not None:
+        if isinstance(e, _litellm_mod.BadRequestError):
+            return ProxyException(
+                message=_strip_prefix(str(e)),
+                type=ProxyErrorTypes.bad_request_error,
+                param=getattr(e, "param", "None"),
+                code=400,
+            )
+        if isinstance(e, _litellm_mod.NotFoundError):
+            return ProxyException(
+                message=_strip_prefix(str(e)),
+                type=ProxyErrorTypes.not_found_error,
+                param=getattr(e, "param", "None"),
+                code=404,
+            )
+        if isinstance(e, _litellm_mod.AuthenticationError):
+            return ProxyException(
+                message=_strip_prefix(str(e)),
+                type=ProxyErrorTypes.authentication_error,
+                param=getattr(e, "param", "None"),
+                code=401,
+            )
+        if isinstance(e, _litellm_mod.UnprocessableEntityError):
+            return ProxyException(
+                message=_strip_prefix(str(e)),
+                type=ProxyErrorTypes.bad_request_error,
+                param=getattr(e, "param", "None"),
+                code=422,
+            )
+        if isinstance(e, _litellm_mod.Timeout):
+            return ProxyException(
+                message=_strip_prefix(str(e)),
+                type=ProxyErrorTypes.internal_server_error,
+                param=getattr(e, "param", "None"),
+                code=408,
+            )
+
     if isinstance(e, HTTPException):
         return ProxyException(
             message=getattr(e, "detail", f"error({str(e)})"),

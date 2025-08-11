@@ -23,6 +23,7 @@ from litellm.litellm_core_utils.litellm_logging import Logging as LiteLLMLogging
 from litellm.llms.azure.batches.handler import AzureBatchesAPI
 from litellm.llms.openai.openai import OpenAIBatchesAPI
 from litellm.llms.vertex_ai.batches.handler import VertexAIBatchPrediction
+from litellm.llms.anthropic.batches.handler import AnthropicBatchesAPI
 from litellm.secret_managers.main import get_secret_str
 from litellm.types.llms.openai import (
     Batch,
@@ -38,6 +39,7 @@ from litellm.utils import client, get_litellm_params, supports_httpx_timeout
 openai_batches_instance = OpenAIBatchesAPI()
 azure_batches_instance = AzureBatchesAPI()
 vertex_ai_batches_instance = VertexAIBatchPrediction(gcs_bucket_name="")
+anthropic_batches_instance = AnthropicBatchesAPI()
 #################################################
 
 
@@ -46,7 +48,7 @@ async def acreate_batch(
     completion_window: Literal["24h"],
     endpoint: Literal["/v1/chat/completions", "/v1/embeddings", "/v1/completions"],
     input_file_id: str,
-    custom_llm_provider: Literal["openai", "azure", "vertex_ai"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "vertex_ai", "anthropic"] = "openai",
     metadata: Optional[Dict[str, str]] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
@@ -94,7 +96,7 @@ def create_batch(
     completion_window: Literal["24h"],
     endpoint: Literal["/v1/chat/completions", "/v1/embeddings", "/v1/completions"],
     input_file_id: str,
-    custom_llm_provider: Literal["openai", "azure", "vertex_ai"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "vertex_ai", "anthropic"] = "openai",
     metadata: Optional[Dict[str, str]] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
@@ -246,6 +248,27 @@ def create_batch(
                 max_retries=optional_params.max_retries,
                 create_batch_data=_create_batch_request,
             )
+        elif custom_llm_provider == "anthropic":
+            api_base = (
+                optional_params.api_base
+                or litellm.api_base
+                or get_secret_str("ANTHROPIC_API_BASE")
+            )
+            api_key = (
+                optional_params.api_key
+                or litellm.api_key
+                or litellm.anthropic_key
+                or get_secret_str("ANTHROPIC_API_KEY")
+            )
+
+            response = anthropic_batches_instance.create_batch(
+                _is_async=_is_async,
+                api_base=api_base,
+                api_key=api_key,
+                timeout=timeout,
+                max_retries=optional_params.max_retries,
+                create_batch_data=_create_batch_request,
+            )
         else:
             raise litellm.exceptions.BadRequestError(
                 message="LiteLLM doesn't support custom_llm_provider={} for 'create_batch'".format(
@@ -267,7 +290,7 @@ def create_batch(
 @client
 async def aretrieve_batch(
     batch_id: str,
-    custom_llm_provider: Literal["openai", "azure", "vertex_ai"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "vertex_ai", "anthropic"] = "openai",
     metadata: Optional[Dict[str, str]] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
@@ -309,7 +332,7 @@ async def aretrieve_batch(
 @client
 def retrieve_batch(
     batch_id: str,
-    custom_llm_provider: Literal["openai", "azure", "vertex_ai"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "vertex_ai", "anthropic"] = "openai",
     metadata: Optional[Dict[str, str]] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
@@ -451,6 +474,27 @@ def retrieve_batch(
                 timeout=timeout,
                 max_retries=optional_params.max_retries,
             )
+        elif custom_llm_provider == "anthropic":
+            api_base = (
+                optional_params.api_base
+                or litellm.api_base
+                or get_secret_str("ANTHROPIC_API_BASE")
+            )
+            api_key = (
+                optional_params.api_key
+                or litellm.api_key
+                or litellm.anthropic_key
+                or get_secret_str("ANTHROPIC_API_KEY")
+            )
+
+            response = anthropic_batches_instance.retrieve_batch(
+                _is_async=_is_async,
+                batch_id=batch_id,
+                api_base=api_base,
+                api_key=api_key,
+                timeout=timeout,
+                max_retries=optional_params.max_retries,
+            )
         else:
             raise litellm.exceptions.BadRequestError(
                 message="LiteLLM doesn't support {} for 'create_batch'. Only 'openai' is supported.".format(
@@ -473,7 +517,7 @@ def retrieve_batch(
 async def alist_batches(
     after: Optional[str] = None,
     limit: Optional[int] = None,
-    custom_llm_provider: Literal["openai", "azure"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "vertex_ai", "anthropic"] = "openai",
     metadata: Optional[Dict[str, str]] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
@@ -516,7 +560,7 @@ async def alist_batches(
 def list_batches(
     after: Optional[str] = None,
     limit: Optional[int] = None,
-    custom_llm_provider: Literal["openai", "azure"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "vertex_ai", "anthropic"] = "openai",
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
     **kwargs,
@@ -613,6 +657,54 @@ def list_batches(
                 max_retries=optional_params.max_retries,
                 litellm_params=litellm_params,
             )
+        elif custom_llm_provider == "anthropic":
+            api_base = (
+                optional_params.api_base
+                or litellm.api_base
+                or get_secret_str("ANTHROPIC_API_BASE")
+            )
+            api_key = (
+                optional_params.api_key
+                or litellm.api_key
+                or litellm.anthropic_key
+                or get_secret_str("ANTHROPIC_API_KEY")
+            )
+
+            response = anthropic_batches_instance.list_batches(
+                _is_async=_is_async,
+                api_base=api_base,
+                api_key=api_key,
+                timeout=timeout,
+                max_retries=optional_params.max_retries,
+                litellm_params=litellm_params,
+            )
+        elif custom_llm_provider == "vertex_ai":
+            api_base = optional_params.api_base or ""
+            vertex_ai_project = (
+                optional_params.vertex_project
+                or litellm.vertex_project
+                or get_secret_str("VERTEXAI_PROJECT")
+            )
+            vertex_ai_location = (
+                optional_params.vertex_location
+                or litellm.vertex_location
+                or get_secret_str("VERTEXAI_LOCATION")
+            )
+            vertex_credentials = optional_params.vertex_credentials or get_secret_str(
+                "VERTEXAI_CREDENTIALS"
+            )
+
+            response = vertex_ai_batches_instance.list_batches(
+                _is_async=_is_async,
+                api_base=api_base,
+                vertex_project=vertex_ai_project,
+                vertex_location=vertex_ai_location,
+                vertex_credentials=vertex_credentials,
+                timeout=timeout,
+                max_retries=optional_params.max_retries,
+                after=after,
+                limit=limit,
+            )
         else:
             raise litellm.exceptions.BadRequestError(
                 message="LiteLLM doesn't support {} for 'list_batch'. Only 'openai' is supported.".format(
@@ -633,7 +725,7 @@ def list_batches(
 
 async def acancel_batch(
     batch_id: str,
-    custom_llm_provider: Literal["openai", "azure"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "vertex_ai", "anthropic"] = "openai",
     metadata: Optional[Dict[str, str]] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
@@ -674,7 +766,7 @@ async def acancel_batch(
 
 def cancel_batch(
     batch_id: str,
-    custom_llm_provider: Literal["openai", "azure"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "vertex_ai", "anthropic"] = "openai",
     metadata: Optional[Dict[str, str]] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
@@ -780,6 +872,54 @@ def cancel_batch(
                 max_retries=optional_params.max_retries,
                 cancel_batch_data=_cancel_batch_request,
                 litellm_params=litellm_params,
+            )
+        elif custom_llm_provider == "anthropic":
+            api_base = (
+                optional_params.api_base
+                or litellm.api_base
+                or get_secret_str("ANTHROPIC_API_BASE")
+            )
+            api_key = (
+                optional_params.api_key
+                or litellm.api_key
+                or litellm.anthropic_key
+                or get_secret_str("ANTHROPIC_API_KEY")
+            )
+
+            response = anthropic_batches_instance.cancel_batch(
+                _is_async=_is_async,
+                api_base=api_base,
+                api_key=api_key,
+                timeout=timeout,
+                max_retries=optional_params.max_retries,
+                cancel_batch_data=_cancel_batch_request,
+                litellm_params=litellm_params,
+            )
+        elif custom_llm_provider == "vertex_ai":
+            api_base = optional_params.api_base or ""
+            vertex_ai_project = (
+                optional_params.vertex_project
+                or litellm.vertex_project
+                or get_secret_str("VERTEXAI_PROJECT")
+            )
+            vertex_ai_location = (
+                optional_params.vertex_location
+                or litellm.vertex_location
+                or get_secret_str("VERTEXAI_LOCATION")
+            )
+            vertex_credentials = optional_params.vertex_credentials or get_secret_str(
+                "VERTEXAI_CREDENTIALS"
+            )
+
+            response = vertex_ai_batches_instance.cancel_batch(
+                _is_async=_is_async,
+                batch_id=batch_id,
+                api_base=api_base,
+                vertex_project=vertex_ai_project,
+                vertex_location=vertex_ai_location,
+                vertex_credentials=vertex_credentials,
+                timeout=timeout,
+                max_retries=optional_params.max_retries,
             )
         else:
             raise litellm.exceptions.BadRequestError(

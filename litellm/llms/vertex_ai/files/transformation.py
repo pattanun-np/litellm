@@ -111,12 +111,12 @@ class VertexAIFilesConfig(VertexBase, BaseFilesConfig):
         """
         Gets a unique GCS object name for the VertexAI batch prediction job
 
-        named as: litellm-vertex-{model}-{uuid}
+        named as: litellm-vertex-files/{model}/{uuid}/input.jsonl
         """
         _model = openai_jsonl_content[0].get("body", {}).get("model", "")
         if "publishers/google/models" not in _model:
             _model = f"publishers/google/models/{_model}"
-        object_name = f"litellm-vertex-files/{_model}/{uuid.uuid4()}"
+        object_name = f"litellm-vertex-files/{_model}/{uuid.uuid4()}/input.jsonl"
         return object_name
 
     def get_object_name(
@@ -230,7 +230,7 @@ class VertexAIFilesConfig(VertexBase, BaseFilesConfig):
         """
 
         vertex_jsonl_content = []
-        for _openai_jsonl_content in openai_jsonl_content:
+        for index, _openai_jsonl_content in enumerate(openai_jsonl_content):
             openai_request_body = _openai_jsonl_content.get("body") or {}
             vertex_request_body = _transform_request_body(
                 messages=openai_request_body.get("messages", []),
@@ -240,7 +240,8 @@ class VertexAIFilesConfig(VertexBase, BaseFilesConfig):
                 litellm_params={},
                 cached_content=None,
             )
-            vertex_jsonl_content.append({"request": vertex_request_body})
+            custom_id: str = _openai_jsonl_content.get("custom_id", f"req-{index}")
+            vertex_jsonl_content.append({"request": vertex_request_body, "custom_id": custom_id})
         return vertex_jsonl_content
 
     def transform_create_file_request(
@@ -397,12 +398,12 @@ class VertexAIJsonlFilesTransformation(VertexGeminiConfig):
         """
         Gets a unique GCS object name for the VertexAI batch prediction job
 
-        named as: litellm-vertex-{model}-{uuid}
+        named as: litellm-vertex-files/{model}/{uuid}/input.jsonl
         """
         _model = openai_jsonl_content[0].get("body", {}).get("model", "")
         if "publishers/google/models" not in _model:
             _model = f"publishers/google/models/{_model}"
-        object_name = f"litellm-vertex-files/{_model}/{uuid.uuid4()}"
+        object_name = f"litellm-vertex-files/{_model}/{uuid.uuid4()}/input.jsonl"
         return object_name
 
     def _map_openai_to_vertex_params(

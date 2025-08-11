@@ -21,6 +21,7 @@ from litellm.llms.azure.files.handler import AzureOpenAIFilesAPI
 from litellm.llms.custom_httpx.llm_http_handler import BaseLLMHTTPHandler
 from litellm.llms.openai.openai import FileDeleted, FileObject, OpenAIFilesAPI
 from litellm.llms.vertex_ai.files.handler import VertexAIFilesHandler
+from litellm.llms.anthropic.files.handler import AnthropicFilesHandler
 from litellm.types.llms.openai import (
     CreateFileRequest,
     FileContentRequest,
@@ -43,6 +44,7 @@ base_llm_http_handler = BaseLLMHTTPHandler()
 openai_files_instance = OpenAIFilesAPI()
 azure_files_instance = AzureOpenAIFilesAPI()
 vertex_ai_files_instance = VertexAIFilesHandler()
+anthropic_files_instance = AnthropicFilesHandler()
 #################################################
 
 
@@ -729,9 +731,10 @@ def file_list(
         raise e
 
 
+@client
 async def afile_content(
     file_id: str,
-    custom_llm_provider: Literal["openai", "azure"] = "openai",
+    custom_llm_provider: Literal["openai", "azure", "anthropic"] = "openai",
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
     **kwargs,
@@ -775,7 +778,7 @@ def file_content(
     file_id: str,
     model: Optional[str] = None,
     custom_llm_provider: Optional[
-        Union[Literal["openai", "azure", "vertex_ai"], str]
+        Union[Literal["openai", "azure", "vertex_ai", "anthropic"], str]
     ] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     extra_body: Optional[Dict[str, str]] = None,
@@ -886,6 +889,42 @@ def file_content(
                 file_content_request=_file_content_request,
                 client=client,
                 litellm_params=litellm_params_dict,
+            )
+        elif custom_llm_provider == "vertex_ai":
+            # For file content: if file_id starts with gs:// treat it as results uri and stream content
+            if file_id.startswith("gs://"):
+                return vertex_ai_files_instance.get_results_content(
+                    file_id=file_id,
+                    timeout=timeout,
+                    extra_headers=extra_headers,
+                )
+            else:
+                # Reject non-gs:// ids for file content to avoid unintended create flows
+                raise litellm.exceptions.BadRequestError(
+                    message="For vertex_ai file content, pass a gs:// results URI (folder or predictions.jsonl)",
+                    model="n/a",
+                    llm_provider="vertex_ai",
+                    response=httpx.Response(
+                        status_code=400,
+                        content="Invalid file_id for vertex_ai file content",
+                        request=httpx.Request(method="file_content", url="https://github.com/BerriAI/litellm"),  # type: ignore
+                    ),
+                )
+        elif custom_llm_provider == "anthropic":
+            api_base = optional_params.api_base or litellm.api_base or get_secret_str("ANTHROPIC_API_BASE")  # type: ignore
+            api_key = (
+                optional_params.api_key
+                or litellm.api_key
+                or litellm.anthropic_key
+                or get_secret_str("ANTHROPIC_API_KEY")
+            )  # type: ignore
+            
+            response = anthropic_files_instance.file_content(
+                file_id=file_id,
+                api_base=api_base,
+                api_key=api_key,
+                timeout=timeout,
+                extra_headers=extra_headers,
             )
         else:
             raise litellm.exceptions.BadRequestError(
