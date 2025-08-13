@@ -202,6 +202,7 @@ async def create_file(
     purpose: str = Form(...),
     target_model_names: str = Form(default=""),
     provider: Optional[str] = None,
+    type: str = Form(default="completion"),
     custom_llm_provider: str = Form(default="openai"),
     file: UploadFile = File(...),
     user_api_key_dict: UserAPIKeyAuth = Depends(user_api_key_auth),
@@ -285,9 +286,14 @@ async def create_file(
                     model=router_model, llm_router=llm_router
                 )
 
-        _create_file_request = CreateFileRequest(
-            file=file_data, purpose=cast(CREATE_FILE_REQUESTS_PURPOSE, purpose), **data
-        )
+        base_request = {
+            "file": file_data,
+            "purpose": cast(CREATE_FILE_REQUESTS_PURPOSE, purpose),
+            **data,
+        }
+        if custom_llm_provider == "vertex_ai":
+            base_request["extra_body"] = {"type": type}
+        _create_file_request = CreateFileRequest(**base_request)  # type: ignore
 
         response = await route_create_file(
             llm_router=llm_router,

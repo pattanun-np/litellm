@@ -275,11 +275,25 @@ class VertexAIFilesConfig(VertexBase, BaseFilesConfig):
             openai_jsonl_content = [
                 json.loads(line) for line in file_content.splitlines() if line.strip()
             ]
-            vertex_jsonl_content = (
-                self._transform_openai_jsonl_content_to_vertex_ai_jsonl_content(
-                    openai_jsonl_content
+            # Detect batch type: default completion
+            batch_type = (
+                (create_file_data.get("extra_body") or {}).get("type")
+                if isinstance(create_file_data.get("extra_body"), dict)
+                else None
+            ) or "completion"
+
+            if batch_type == "embedding":
+                vertex_jsonl_content = (
+                    self.jsonl_transformation._transform_openai_embeddings_jsonl_content_to_vertex_ai_jsonl_content(
+                        openai_jsonl_content
+                    )
                 )
-            )
+            else:
+                vertex_jsonl_content = (
+                    self.jsonl_transformation._transform_openai_jsonl_content_to_vertex_ai_jsonl_content(
+                        openai_jsonl_content
+                    )
+                )
             return "\n".join(json.dumps(item, ensure_ascii=False) for item in vertex_jsonl_content)
         elif isinstance(extracted_file_data_content, bytes):
             return extracted_file_data_content
@@ -378,7 +392,7 @@ class VertexAIJsonlFilesTransformation(VertexGeminiConfig):
         """
 
         vertex_jsonl_content = []
-        for _openai_jsonl_content in openai_jsonl_content:
+        for index, _openai_jsonl_content in enumerate(openai_jsonl_content):
             openai_request_body = _openai_jsonl_content.get("body") or {}
             vertex_request_body = _transform_request_body(
                 messages=openai_request_body.get("messages", []),
@@ -388,7 +402,58 @@ class VertexAIJsonlFilesTransformation(VertexGeminiConfig):
                 litellm_params={},
                 cached_content=None,
             )
-            vertex_jsonl_content.append({"request": vertex_request_body})
+            custom_id: str = _openai_jsonl_content.get("custom_id", f"req-{index}")
+            vertex_jsonl_content.append({"request": vertex_request_body, "custom_id": custom_id})
+        return vertex_jsonl_content
+
+    def _transform_openai_embeddings_jsonl_content_to_vertex_ai_jsonl_content(
+        self, openai_jsonl_content: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """
+        Transforms OpenAI Embeddings JSONL to Vertex AI embeddings JSONL
+
+        OpenAI line example:
+        {"custom_id":"req-1","method":"POST","url":"/v1/embeddings","body":{"model":"text-embedding-004","input":"hello"}}
+
+        We convert to Vertex JSONL lines like:
+        {"request": {"model": "models/text-embedding-004", "content": {"parts": [{"text": "hello"}]}}}
+
+        If input is a list, generate one line per element.
+        """
+        vertex_jsonl_content: List[Dict[str, Any]] = []
+        for index, _openai_jsonl_content in enumerate(openai_jsonl_content):
+            body = _openai_jsonl_content.get("body", {}) or {}
+            input_value = body.get("input")
+            custom_id: str = _openai_jsonl_content.get("custom_id", f"req-{index}")
+
+            # Optional mappings
+            task_type = body.get("task_type") or body.get("taskType")
+            title = body.get("title")
+
+            def _make_vertex_request(text: str) -> Dict[str, Any]:
+                req: Dict[str, Any] = {"content": text}
+                if isinstance(task_type, str):
+                    req["task_type"] = task_type
+                if isinstance(title, str):
+                    req["title"] = title
+                return req
+
+            if isinstance(input_value, list):
+                for idx, item in enumerate(input_value):
+                    if not isinstance(item, str):
+                        continue
+                    req = _make_vertex_request(item)
+                    req["custom_id"] = f"{custom_id}-{idx}"
+                    vertex_jsonl_content.append(req)
+            elif isinstance(input_value, str):
+                req = _make_vertex_request(input_value)
+                req["custom_id"] = custom_id
+                vertex_jsonl_content.append(req)
+            else:
+                raise ValueError(
+                    "Invalid embeddings input in JSONL line: 'input' must be a string or a list of strings"
+                )
+
         return vertex_jsonl_content
 
     def _get_gcs_object_name(
