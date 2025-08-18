@@ -318,7 +318,14 @@ class RouteChecks:
         - pattern: "/key/{token_id}/regenerate"
         - route: "/key/regenerate/82akk800000000jjsk"
         - returns: False, pattern is "/key/{token_id}/regenerate"
+        
+        - pattern: "/v1/files/{file_id:path}/content"
+        - route: "/v1/files/gs://bucket/path/to/file/content"
+        - returns: True (supports path parameters with slashes)
         """
+        # Handle path parameters with :path suffix (allows slashes)
+        pattern = re.sub(r"\{[^}]+:path\}", r".+", pattern)
+        # Handle regular parameters (no slashes allowed)
         pattern = re.sub(r"\{[^}]+\}", r"[^/]+", pattern)
         # Anchor the pattern to match the entire string
         pattern = f"^{pattern}$"

@@ -17,9 +17,20 @@ class LodashError(BaseLLMException):
         message: str,
         headers: Union[dict, httpx.Headers] = {},
     ):
-        request = httpx.Request(
-            method="POST", url="http://127.0.0.1:8000/api/v1/app2/gateway/embeddings"
+        # Use environment variable for error reporting URL or fallback to default
+        error_url = (
+            get_secret_str("LODASH_API_BASE") 
+            or get_secret_str("LODASH_BASE_URL")
+            or get_secret_str("LODASH_API_URL")
+            or "http://127.0.0.1:8000/api/v1/app2/gateway"
         )
+        if not error_url.endswith("/embeddings"):
+            if not error_url.endswith("/"):
+                error_url = f"{error_url}/embeddings"
+            else:
+                error_url = f"{error_url}embeddings"
+        
+        request = httpx.Request(method="POST", url=error_url)
         response = httpx.Response(status_code=status_code, request=request)
         super().__init__(
             status_code=status_code,
@@ -51,7 +62,23 @@ class LodashEmbeddingConfig(BaseEmbeddingConfig):
             if not api_base.endswith("/embeddings"):
                 api_base = f"{api_base}/embeddings"
             return api_base
-        return "http://127.0.0.1:8000/api/v1/app2/gateway/embeddings/local"
+        
+        # Get base URL from environment variables
+        default_base_url = (
+            get_secret_str("LODASH_API_BASE") 
+            or get_secret_str("LODASH_BASE_URL")
+            or get_secret_str("LODASH_API_URL")
+            or "http://127.0.0.1:8000/api/v1/app2/gateway"  # fallback default
+        )
+        
+        # Ensure the URL ends with /embeddings for embedding requests
+        if default_base_url.endswith("/"):
+            default_base_url = default_base_url[:-1]
+        
+        if not default_base_url.endswith("embeddings/local"):
+            default_base_url = f"{default_base_url}/embeddings/local"
+        
+        return default_base_url
 
     def get_supported_openai_params(self, model: str) -> list:
         return [
@@ -162,14 +189,31 @@ class LodashEmbeddingConfig(BaseEmbeddingConfig):
         try:
             response_json = raw_response.json()
         except Exception as e:
+            # Try to parse the raw response text as Lodash error format
+            try:
+                import json
+                raw_text = raw_response.text
+                # Try to parse as JSON first
+                if raw_text.strip().startswith('['):
+                    # Likely Lodash error array format
+                    parsed_error = json.loads(raw_text)
+                    error_message = self._parse_lodash_error(parsed_error)
+                else:
+                    # Try to parse as regular JSON
+                    parsed_error = json.loads(raw_text)
+                    error_message = self._parse_lodash_error(parsed_error)
+            except:
+                # If all parsing fails, use the original exception message
+                error_message = f"Failed to decode response: {str(e)}"
+            
             raise LodashError(
                 status_code=raw_response.status_code,
-                message=f"Failed to decode response: {str(e)}",
+                message=error_message,
             )
 
         # Handle error responses
         if raw_response.status_code != 200:
-            error_message = response_json.get("error", {}).get("message", "Unknown error")
+            error_message = self._parse_lodash_error(response_json)
             raise LodashError(
                 status_code=raw_response.status_code,
                 message=error_message,
@@ -204,11 +248,85 @@ class LodashEmbeddingConfig(BaseEmbeddingConfig):
 
         return model_response
 
+    def _parse_lodash_error(self, response_json: dict) -> str:
+        """
+        Parse Lodash API error response and extract clean error message
+        
+        Lodash API returns errors in format:
+        [
+          {
+            "code": "int",
+            "type": "string", 
+            "failedField": "string",
+            "tag": "string",
+            "errorMessage": "string"
+          }
+        ]
+        
+        Or standard format:
+        {
+          "error": {
+            "message": "string"
+          }
+        }
+        """
+        try:
+            # Check if it's a list of Lodash error objects
+            if isinstance(response_json, list) and len(response_json) > 0:
+                first_error = response_json[0]
+                if isinstance(first_error, dict) and "errorMessage" in first_error:
+                    return first_error["errorMessage"]
+            
+            # Check if response_json itself is a Lodash error object
+            if isinstance(response_json, dict) and "errorMessage" in response_json:
+                return response_json["errorMessage"]
+            
+            # Check for standard error format
+            if isinstance(response_json, dict):
+                error_obj = response_json.get("error", {})
+                if isinstance(error_obj, dict):
+                    return error_obj.get("message", "Unknown error")
+                elif isinstance(error_obj, str):
+                    return error_obj
+            
+            # Fallback for any other format
+            return str(response_json)
+        
+        except Exception:
+            return "Failed to parse error response"
+
     def get_error_class(
         self, error_message: str, status_code: int, headers: Union[dict, httpx.Headers]
     ) -> BaseLLMException:
+        # Parse Lodash error message if it's a JSON string
+        parsed_message = self._parse_lodash_error_from_string(error_message)
+        
         return LodashError(
             status_code=status_code,
-            message=error_message,
+            message=parsed_message,
             headers=headers,
-        ) 
+        )
+
+    def _parse_lodash_error_from_string(self, error_message: str) -> str:
+        """
+        Parse error message that might be a JSON string from Lodash API
+        
+        The error_message from httpx might be a JSON string like:
+        '[{"code": 400, "type": "Bad Request", "failedField": "/app/models/gateway/embeddings.py:187", "tag": "invalid_request_input", "errorMessage": "Model \'all-distilroberta-v1\' is not allowed..."}]'
+        """
+        try:
+            import json
+            
+            # Try to parse as JSON
+            if error_message.strip().startswith('[') or error_message.strip().startswith('{'):
+                parsed_json = json.loads(error_message)
+                # Use existing _parse_lodash_error method
+                clean_message = self._parse_lodash_error(parsed_json)
+                return clean_message
+            
+            # If it's not JSON, return as is
+            return error_message
+            
+        except (json.JSONDecodeError, TypeError, ValueError):
+            # If parsing fails, return original message
+            return error_message 

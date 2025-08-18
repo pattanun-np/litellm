@@ -138,7 +138,7 @@ class VertexAIBatchPrediction(VertexLLM):
         max_retries: Optional[int],
     ) -> Union[LiteLLMBatch, Coroutine[Any, Any, LiteLLMBatch]]:
         sync_handler = _get_httpx_client()
-
+# 
         access_token, project_id = self._ensure_access_token(
             credentials=vertex_credentials,
             project_id=vertex_project,

@@ -28,12 +28,19 @@ print(response)
 
 ## Authentication
 
-### Environment Variable
-Set your Lodash AI API key as an environment variable:
+### Environment Variables
+Set your Lodash AI API key and optionally the API base URL:
 
 ```bash
 export LODASH_API_KEY="your-api-key"
+export LODASH_API_BASE="https://api.lodash.ai/v1"  # Optional
 ```
+
+**Supported Environment Variables:**
+- `LODASH_API_KEY` / `LODASH_AI_API_KEY` / `LODASH_AI_TOKEN` - API authentication key
+- `LODASH_API_BASE` - Primary API base URL (highest priority)
+- `LODASH_BASE_URL` - Alternative base URL
+- `LODASH_API_URL` - Additional base URL option
 
 ### Direct Parameter
 You can also pass the API key directly in your code:
@@ -137,7 +144,7 @@ print(response)
 | `encoding_format` | string | Format for embeddings (float/base64) | "float" |
 | `dimensions` | integer | Number of dimensions in embeddings | Model default |
 | `api_key` | string | Lodash AI API key | Environment variable |
-| `api_base` | string | Base URL for API calls | "https://ai.lodashventure.com/api/v1/app2" |
+| `api_base` | string | Base URL for API calls | Environment variable or default |
 
 ## LiteLLM Proxy Server
 
@@ -167,6 +174,7 @@ general_settings:
 
 ```bash
 export LODASH_API_KEY="your-api-key"
+export LODASH_API_BASE="https://api.lodash.ai/v1"  # Optional: custom API base
 litellm --config config.yaml
 ```
 
@@ -211,7 +219,26 @@ except Exception as e:
 
 ## Custom API Base
 
-If you're using a custom Lodash AI deployment, you can specify a custom API base:
+You can configure a custom Lodash AI API base URL in several ways:
+
+### Method 1: Environment Variable (Recommended)
+
+```bash
+export LODASH_API_BASE="https://your-custom-domain.com/api/v1"
+export LODASH_API_KEY="your-api-key"
+```
+
+```python
+import litellm
+
+# Uses environment variable automatically
+response = litellm.embedding(
+    model="lodash/all-MiniLM-L6-v2",
+    input="Hello world"
+)
+```
+
+### Method 2: Direct Parameter
 
 ```python
 import litellm
@@ -224,12 +251,27 @@ response = litellm.embedding(
 )
 ```
 
+### Environment Variable Priority
+
+LiteLLM checks environment variables in this order:
+1. `LODASH_API_BASE` (highest priority)
+2. `LODASH_BASE_URL`
+3. `LODASH_API_URL`
+4. Default fallback URL
+
+### URL Handling
+
+- URLs are automatically appended with `/embeddings` if not present
+- Both trailing slash and non-trailing slash formats are supported
+- Custom endpoints like `/embeddings/local` are preserved
+
 ## Rate Limits and Best Practices
 
 1. **Batch Processing**: Process multiple texts in a single request when possible
 2. **Error Handling**: Always implement proper error handling for production use
 3. **API Key Security**: Store API keys securely using environment variables
-4. **Monitoring**: Use LiteLLM's logging features to monitor usage and costs
+4. **Environment Configuration**: Use environment variables for API base URLs in different environments
+5. **Monitoring**: Use LiteLLM's logging features to monitor usage and costs
 
 ## Troubleshooting
 
@@ -243,7 +285,12 @@ response = litellm.embedding(
    - Check that you're using a supported model name
    - Ensure the model name includes the "lodash/" prefix
 
-3. **Rate Limiting (429)**
+3. **Connection/URL Errors**
+   - Verify `LODASH_API_BASE` environment variable is set correctly
+   - Check if the API endpoint is accessible
+   - Ensure URL format is correct (with or without trailing slash)
+
+4. **Rate Limiting (429)**
    - Implement exponential backoff
    - Reduce request frequency
 
@@ -260,6 +307,26 @@ response = litellm.embedding(
     model="lodash/all-MiniLM-L6-v2",
     input="Debug example"
 )
+```
+
+### Environment-Specific Configuration
+
+**Development Environment:**
+```bash
+export LODASH_API_BASE="http://localhost:8000/api/v1/app2/gateway"
+export LODASH_API_KEY="dev-api-key"
+```
+
+**Staging Environment:**
+```bash
+export LODASH_API_BASE="https://staging-api.lodash.ai/v1"
+export LODASH_API_KEY="staging-api-key"
+```
+
+**Production Environment:**
+```bash
+export LODASH_API_BASE="https://api.lodash.ai/v1"
+export LODASH_API_KEY="prod-api-key"
 ```
 
 ## Support

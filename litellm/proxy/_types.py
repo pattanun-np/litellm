@@ -269,6 +269,8 @@ class LiteLLMRoutes(enum.Enum):
         "/files/{file_id}",
         "/v1/files/{file_id}/content",
         "/files/{file_id}/content",
+        "/v1/files/{file_id:path}/content",
+        "/files/{file_id:path}/content",
         # fine_tuning
         "/fine_tuning/jobs",
         "/v1/fine_tuning/jobs",
